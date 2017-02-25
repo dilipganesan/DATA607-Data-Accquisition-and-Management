@@ -1,0 +1,122 @@
+---
+title: "DATA607_HW2"
+author: "Dilip Ganesan"
+date: "02/09/2017"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
+---
+
+```{r, setup, include=FALSE}
+require(mosaic)   # Load additional packages here 
+if (!require("htmlTable")) install.packages('htmlTable')
+library(htmlTable)
+if (!require("ggplot2")) install.packages('ggplot2')
+library(ggplot2)
+if (!require("DBI")) install.packages('DBI')
+library(DBI)
+if (!require("RMySQL")) install.packages('RMySQL')
+library(RMySQL)
+
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+trellis.par.set(theme=theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+## DATA 607 Home Work 2 - R and SQL.
+
+
+### Introduction.
+
+In this Home Work, I have tried to connect to MYSQL database, get records from table and have created data.frames
+
+***SQL Tables:*** 
+Have created three tables for this home work namely REVIEWER, MOVIE_NAMES and REIVIEW_MOVIE_RATINGS 
+Wanted to try Relational database model, so created three tables rather than one.
+
+***Approach*** consist of manipulating the data set in two ways.
+
+*1. Using the SQL query joins *
+
+*2. Using the R programming functions to achieve resulset data.frame *
+
+
+### Step 1: SQL Connection
+
+```{r}
+#Connecting to MySQL database using dbConnect. Password is not masked for home work purpose.
+mydb = dbConnect(MySQL(), user='root', password='mysql@123', dbname='DATA_607', host='localhost')
+dbListTables(mydb)
+```
+
+### Step 2: Fetching records from tables.
+
+```{r}
+# Now trying to get the 3 table data as individual data.frames.
+reviewer <- dbGetQuery(mydb, "select * from reviewer")
+
+movie_names <- dbGetQuery(mydb, "select * from movie_names")
+
+ratings <- dbGetQuery(mydb, "select * from review_movie_rating")
+```
+
+### Step 3: Checking how data got populated in data frames..
+
+```{r}
+head(reviewer)
+head(movie_names)
+head(ratings)
+```
+
+### Step 4: Using the SQL query to attain resultant data frame.
+```{r}
+review_movie_rating= dbGetQuery(mydb, "SELECT A.REVIEWER, B.MOVIE_NAMES, C.RATINGS FROM REVIEWER A, MOVIE_NAMES B, REVIEW_MOVIE_RATING C WHERE C.REVIEWER_ID = A.REVIEWER_ID AND C.MOVIE_ID = B.MOVIE_ID ORDER BY A.REVIEWER;")
+
+dim(review_movie_rating)
+# So the resultset contains 36 rows and 3 variables
+
+# Cleaning out outstanding database connection.
+dbDisconnect(mydb)
+```
+
+### Step 5: Printing Resultant Data Frame.
+```{r}
+htmlTable(review_movie_rating, caption = '2017 SPRING CUNY MSDA CLASS MOVIE REVIEW RATINGS')
+```
+
+### Step 6: Using R Programming functions to create Resultant Data Frame.
+```{r}
+# Used the merge function to merge the data set.
+
+dt<-merge(reviewer,merge(movie_names,ratings,by="movie_id"), by="reviewer_id")
+finaldata= subset(dt,select = c(2,4,5))
+```
+
+### Step 7: Using ggPlot to create a small plot..
+```{r}
+# Plot shows the Mean Ratings across the movies.
+ggplot(review_movie_rating) + geom_bar(aes(review_movie_rating$MOVIE_NAMES, review_movie_rating$RATINGS, fill=review_movie_rating$MOVIE_NAMES), stat="summary", fun.y="mean") + labs(x="Movies", y="Mean Review", title="Mean Ratings of Top American Movies") + theme(axis.text.x=element_blank())
+
+
+ggplot(review_movie_rating) + geom_bar(aes(review_movie_rating$REVIEWER , review_movie_rating$RATINGS, fill=review_movie_rating$REVIEWER), stat="summary", fun.y="mean") + labs(x="Movies", y="Mean Review", title="Mean Ratings of Top American Movies") + theme(axis.text.x=element_blank())
+```
+
+
+
+  * File creation date: `r Sys.Date()`
+  * `r R.version.string`
+  * R version (short form): `r getRversion()`
+  * `mosaic` package version: `r packageVersion("mosaic")`
+  * Additional session information
+  
+
+  

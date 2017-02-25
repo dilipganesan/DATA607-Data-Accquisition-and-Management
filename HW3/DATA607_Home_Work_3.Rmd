@@ -1,0 +1,113 @@
+---
+title: "DATA607_Home_Work_3"
+author: "Dilip Ganesan"
+date: "02/16/2017"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
+---
+
+### Home Work 3 : Regular Expression and R
+
+```{r, setup, include=FALSE}
+require(mosaic)   # Load additional packages here 
+if (!require("stringr")) install.packages('stringr')
+library(stringr)
+
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+trellis.par.set(theme=theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+3. Copy the introductory example. The vector name stores the extracted names.
+
+```{r}
+raw.data="555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert"   
+
+name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+name
+# (a) Use the tools of this chapter to rearrange the vector so that all elements conform to thestandardfirst_name last_name.
+
+first=str_extract(name,"[[:alpha:]]{1,} |\\. [[:alpha:]]{1,}|\\, [[:alpha:]]{2,}")
+first=str_extract(first,"[[:alpha:]]{1,}")
+
+last=str_extract(name,"[[:alpha:]]{1,}\\,|\\b [[:alpha:]]{2,}")
+last=str_extract(last,"[[:alpha:]]{1,}")
+
+df=data.frame(first, last)
+df
+df_args <- c(df, sep=" ")
+do.call(paste, df_args)
+
+
+# (b) Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+
+unlist(str_detect(name,"^Rev|Dr"))
+
+# (c) Construct a logical vector indicating whether a character has a second name.
+# Approach, when the name has a comma, i am assume it to be second name.
+secondname = str_detect(name, ',')
+secondname
+```
+
+4. Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression. 
+
+
+```{r}
+#(a) [0-9]+\\$
+#Ans : This will return numbers followed by a $ sign.
+
+a="147$"
+str_extract(a,'[0-9]+\\$')
+
+#(b) \\b[a-z]{1,4}\\b
+# Ans: This returns 1-4 lower case characters which are bounded by word edge
+
+b = "%abc $"
+str_extract(b, '\\b[a-z]{1,4}\\b')
+
+#(c) .*?\\.txt$
+# Ans: This will return characters which end with .txt files
+
+c="1234 dilip.txt"
+str_extract(c,".*?\\.txt$")
+
+#(d) \\d{2}/\\d{2}/\\d{4}
+#Ans : This will give the date format
+d="01/01/2017"
+str_extract(d,"\\d{2}/\\d{2}/\\d{4}")
+
+
+#(e) <(.+?)>.+?</\\1>
+#Ans : This is used to extract elements like xml tags <abc> and </abc>
+
+e="<td>dilip is doing R home work </td>"
+str_extract(e,'<(.+?)>.+?</\\1>')
+
+
+
+
+
+
+```
+  
+9. The following code hides a secret message. Crack it with R and regular expressions. 
+
+
+```{r}
+# Used the hint from the book to find the removal of lower cases and numbers.
+Jumblecode="clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigOd6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+
+newcode=str_extract_all(Jumblecode,'[^[a-z]|[0-9]]')
+newcode
+     
+```

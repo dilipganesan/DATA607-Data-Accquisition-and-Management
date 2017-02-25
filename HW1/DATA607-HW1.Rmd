@@ -1,0 +1,67 @@
+---
+title: "DATA607-HW1"
+author: "Dilip Ganesan"
+date: "2/4/2017"
+output: html_document
+---
+
+```{r setup}
+if (!require("data.table")) install.packages('data.table')
+if (!require("plyr")) install.packages('plyr')
+library(data.table)
+library(plyr)
+```
+
+
+
+```{r}
+# DATA607 Home Work Assignment 1 : Mushroom Data Set Transformation
+# Step 1: is to get the data set from web.
+
+
+mydata=fread('https://archive.ics.uci.edu/ml/machine-learning-databases/mushroom/agaricus-lepiota.data',header=FALSE)
+mydata=data.frame(mydata)
+head(mydata)
+
+
+# Step 2 : New Data has columns 1 to 6
+newdata=subset(mydata, select = c(1:6))
+head(newdata)
+
+# Step 3: Replace column names to meaningful names
+# 1.classes, 2.shape, 3.surface, 4.color, 5.bruises, 6.odor 
+# Using plyr rename function, going to replace the columns name.
+
+modata=plyr::rename(newdata,c("V1"="Classes","V2"="Shape","V3"="Surface","V4"="Color","V5"="Bruises","V6"="Odor"))
+head(modata)
+
+# Step 4: Replace the e= edible and p=poisonous and values across columns
+masterset = fread('')
+
+x<-c("e"="Edible","p"="Poisonous")
+y<-c("b"="Bell","c"="Conical","x"="Convex","f"="Flat","k"="Knobbed", "s"="Sunken")
+a<-c("f"="Fibrous","g"="Grooves","y"="Scaly","s"="Smooth")
+b<-c("n"="Brown","b"="Buff","c"="Cinnamon","g"="Gray","r"="Green", "p"="Pink", "u"="Purple", "e"="Red", "w"="White", "y"="Yellow")
+c<-c("t"="Bruises","f"="No")
+d<-c("a"="Almond","l"="Anise","c"="Creosote","y"="Fishy","f"="Foul", "m"="Musty", "n"="None", "p"="Pungent", "s"="Spicy")
+
+# Step 5: Applying the Revalue function in plyr to rename the values.
+
+modata$Classes=revalue(modata$Classes,x)
+modata$Shape=revalue(modata$Shape,y)
+modata$Surface=revalue(modata$Surface,a)
+modata$Color=revalue(modata$Color,b)
+modata$Bruises=revalue(modata$Bruises,c)
+modata$Odor=revalue(modata$Odor,d)
+
+head(modata)
+#The whole data set can be printed by un commenting the below line.
+#modata
+
+```
+
+
+```{r}
+
+```
+
