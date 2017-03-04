@@ -1,0 +1,96 @@
+---
+title: "DATA 607 Home Work 5"
+author: "Dilip Ganesan"
+date: "02/28/2017"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
+---
+
+```{r, setup, include=FALSE}
+require(mosaic)   # Load additional packages here 
+if (!require("ggplot2")) install.packages('ggplot2')
+if (!require("tidyr")) install.packages('tidyr')
+if (!require("dplyr")) install.packages('dplyr')
+if (!require("data.table")) install.packages('data.table')
+if (!require("plyr")) install.packages('plyr')
+
+library(tidyr)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(data.table)
+
+# Some customization.  You can alter or delete as desired (if you know what you are doing).
+trellis.par.set(theme=theme.mosaic()) # change default color scheme for lattice
+knitr::opts_chunk$set(
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+```
+
+***Step 1: Loading the csv file and storing in data frame.***
+
+```{r}
+flighttimings=fread('flighttime.csv')
+flighttimings=data.frame(flighttimings)
+head(flighttimings)
+
+knitr::kable(flighttimings)
+```
+
+
+***Step 2: Cleaning of data.***
+
+```{r}
+# Removing the NA row from data frame.
+flighttimings = flighttimings %>% na.omit()
+# Adding Flight Names for Missing Rows
+flighttimings[2,1]="ALASKA"
+flighttimings[4,1]="AMWEST"
+
+# Adding Column Header for the missing columns.
+flighttimings=plyr::rename(flighttimings,c("V1"="Airline","V2"="Status"))
+```
+
+***Step 3: Data Transformation using TIDYR ***
+
+```{r}
+tidyflight = flighttimings %>% 
+    gather(cities, count, 3:7) %>% 
+    spread(Status, count)
+
+
+knitr::kable(tidyflight)
+
+
+
+```
+
+***Step 4: Data Analysis ***
+
+```{r}
+# Delay Calculation
+
+tidyflight = tidyflight %>%
+    mutate(total=`on time` + delayed, delayratio=round(delayed/total, 3)) 
+
+knitr::kable(tidyflight)
+
+
+ggplot(tidyflight, aes(tidyflight$delayratio, tidyflight$Airline, colour = tidyflight$delayratio)) + 
+  geom_point()
+
+
+```
+
+### ***Conclusion ***
+
+***The city delay ratios by airline show that ALASKA airlines have a lower individual delay ratio than AMWEST in every single city.***
+***But if the volume of flights are taken into account, then this might change.***
