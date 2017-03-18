@@ -1,0 +1,23 @@
+{"rbooklist": [
+ {"title": "R for Data Sciene",
+  "year": 2016,
+  "authors": ["Hadley Wickham"],
+  "publisher": "O Reilly",
+  "numpages": 492,
+  "goodreadsrank": 4.7
+ },
+ {"title": "Data Structures and Algorithms",
+  "year": 2003,
+  "authors": ["Robert Lafore"],
+  "publisher": "SAMS",
+  "numpages": 780,
+  "goodreadsrank": 4.1
+ },
+ {"title": "Automated Data Collection in R",
+  "year": 2015,
+  "authors": ["Simon Munzert", "Christian Rubba", "Peter Meissner", "Dominic Nyhuis"],
+  "publisher": "Wiley Press",
+  "numpages": 480,
+  "goodreadsrank": 4.0
+ }]
+}

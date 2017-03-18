@@ -1,0 +1,83 @@
+---
+title: "DATA607_Home_Work_7"
+output: github_document
+author: "Dilip Ganesan"
+date: "03/18/2017"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## DATA 607 Home Work
+
+Pick three of your favorite books on one of your favorite subjects. At least one of the books should have more than one author. For each book, include the title, authors, and two or three other attributes that you find interesting.
+Take the information that you’ve selected about these three books, and separately create three files which store the book’s information in HTML (using an html table), XML, and JSON formats (e.g. “books.html”, “books.xml”, and “books.json”). To help you better understand the different file structures, I’d prefer that you create each of these files “by hand” unless you’re already very comfortable with the file formats.
+
+## Environment Setup
+
+```{r}
+if (!require('rvest')) install.packages('rvest')
+if (!require('XML')) install.packages('XML')
+if (!require('jsonlite')) install.packages('jsonlite')
+
+```
+
+## Loading files into R
+
+
+```{r}
+# Loading Html into R using rvest.
+html=read_html("books.html")
+html_tab=html_table(html)
+html_df = data.frame(html_tab)
+knitr::kable(html_df)
+```
+
+```{r}
+# Loading JSON into R using jsonlite.
+json=fromJSON("books.json")
+
+# Reference from strack trace to use the function.
+json = lapply(json, function(x) {
+  x[sapply(x, is.null)] <- NA
+  unlist(x)
+})
+json_df=do.call("rbind", json)
+json_df=t(json_df)
+
+knitr::kable(json_df)
+```
+
+
+```{r}
+xml_file=xmlParse("books.xml")
+xml_df=xmlToDataFrame(xml_file)
+
+knitr::kable(xml_df)
+```
+
+## Comparing Data Frames
+
+
+```{r}
+# Test Case 1 : HTML vs JSON
+
+all.equal(html_df,json_df)
+
+
+# Test Case 1 : HTML vs XML
+
+all.equal(html_df,xml_df)
+
+
+# Test Case 1 : JSON vs XML
+
+all.equal(json_df,xml_df)
+
+```
+
+## Test Result.
+
+Only the values in the data frames are same, but the structures are different. Test Case 1 and 3 looks somewhat identical.
+
