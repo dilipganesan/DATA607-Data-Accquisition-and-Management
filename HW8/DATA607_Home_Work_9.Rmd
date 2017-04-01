@@ -1,0 +1,64 @@
+---
+title: "DATA607_Home_Work_9"
+output: github_document
+author: Dilip Ganesan
+date: 03/30/2017
+---
+
+## Environment Setup.
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+if (!require('jsonlite')) install.packages('jsonlite')
+if (!require('dplyr')) install.packages('dplyr')
+
+
+library(jsonlite)
+library(dplyr)
+
+```
+
+## Loading the API Key
+```{r}
+# Kept the key in a different file.
+source("apikey.R")
+```
+
+
+## Getting Key and tweakingfrom File.
+```{r}
+jsonurl=paste0(techurl,"?")
+jsonbookurl=paste0(bookurl,"?")
+```
+
+## Getting JSON data.
+```{r}
+jsonurl=paste0(jsonurl,key)
+jsonurl
+jsonbookurl=paste0(jsonbookurl,key)
+jsonbookurl
+nydata=fromJSON(jsonurl)
+nybookdata=fromJSON(jsonbookurl)
+```
+
+## Massaging of Data.
+```{r}
+# NYC Tech Result Data.
+nytechdata=nydata$results
+
+nytechdata=nytechdata %>%
+  filter(section=="Technology") %>%
+  select(title, abstract, byline, url)
+
+# NYC Book Result Data.
+nybookdf=nybookdata$results
+
+```
+
+## Conclusion
+```{r}
+knitr::kable(nytechdata)
+knitr::kable(nybookdf$lists)
+```
