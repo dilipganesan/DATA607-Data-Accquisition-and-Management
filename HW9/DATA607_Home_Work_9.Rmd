@@ -1,0 +1,116 @@
+---
+title: "DATA607_HW9"
+author: "Dilip Ganesan"
+date: "04/29/2017"
+output:
+  pdf_document:
+    fig_height: 3
+    fig_width: 5
+  html_document:
+    fig_height: 3
+    fig_width: 5
+  word_document:
+    fig_height: 3
+    fig_width: 5
+---
+
+```{r, setup, include=FALSE}
+
+if (!require("DBI")) install.packages('DBI')
+library(DBI)
+if (!require("RMySQL")) install.packages('RMySQL')
+library(RMySQL)
+if(!require("mongolite"))install.packages("mongolite")
+library(mongolite)
+
+
+```
+
+## DATA 607 Home Work 9 - R/MySQL/MongoDB.
+
+
+### Introduction.
+
+In this Home Work, I have tried to connect to MYSQL database, get records from table and have created data.frames and migtrated the data to MongoDB.
+
+***SQL Tables:*** 
+Have created three tables for this home work namely REVIEWER, MOVIE_NAMES and REIVIEW_MOVIE_RATINGS 
+
+***Mongo***
+
+In MongoDB, everything is just a Collection. So all the individual fields will get moved as a single collection.
+
+
+
+### Step 1: SQL Connection
+
+```{r}
+#Connecting to MySQL database using dbConnect. Password is not masked for home work purpose.
+mydb = dbConnect(MySQL(), user='root', password='mysql@123', dbname='DATA607', host='localhost')
+dbListTables(mydb)
+```
+
+### Step 2: Fetching records from tables.
+
+```{r}
+# Now trying to get the 3 table data as individual data.frames.
+reviewer <- dbGetQuery(mydb, "select * from reviewer")
+
+movie_names <- dbGetQuery(mydb, "select * from movie_names")
+
+ratings <- dbGetQuery(mydb, "select * from review_movie_rating")
+```
+
+### Step 3: Checking how data got populated in data frames..
+
+```{r}
+head(reviewer)
+head(movie_names)
+head(ratings)
+```
+
+### Step 4: Connecting to MongoDB using MongoLite.
+```{r}
+##if (!require("RMongo")) install.packages('RMongo')
+ ##library(RMongo)
+
+##mongo = mongoDbConnect("test", "127.0.0.1", 27017)
+
+##b=mongo.bson.from.df(reviewer)
+
+##output <- dbInsertDocument(mongo, "reviewer", reviewer)
+##output <- dbGetQuery(mongo, 'test_data', '{"foo": "bar"}')
+##print(output)
+
+# Connectiong to MongoDB using MongoLite pacakge
+con=mongo(collection = "test", db = "test", url = "mongodb://localhost",
+verbose = FALSE, options = ssl_options())
+
+
+
+```
+
+### Step 5: Migrating Data to Mongo DB.
+```{r}
+# Inserting in to MongoDB
+con$insert(reviewer)
+con$insert(movie_names)
+con$insert(ratings)
+
+# Getting the count of rows
+con$count()
+
+#Find Query to select all fields
+alldata=con$find('{}')
+knitr::kable(alldata)
+
+#Remove all data from MongoDB
+con$remove('{}')
+
+#Drop the collection
+con$drop()
+```
+
+
+
+
